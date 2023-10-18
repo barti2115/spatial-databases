@@ -1,0 +1,52 @@
+-- zadanie 4
+create table buildings (id integer, geometry geometry, name varchar);
+create table poi (id integer, geometry geometry, name varchar);
+create table roads (id integer, geometry geometry, name varchar);
+
+-- zadanie 5
+insert into buildings values
+	(1, 'POLYGON((8 4, 10.5 4, 10.5 1.5, 8 1.5, 8 4))', 'BuildingA'),
+	(2, 'POLYGON((4 7, 6 7, 6 5, 4 5, 4 7))', 'BuildingB'),
+	(3, 'POLYGON((3 8, 5 8, 5 6, 3 6, 3 8))', 'BuildingC'),
+	(4, 'POLYGON((9 9, 10 9, 10 8, 9 8, 9 9))', 'BuildingD'),
+	(5, 'POLYGON((1 2, 2 2, 2 1, 1 1, 1 2))', 'BuildingF');
+	
+insert into roads values
+	(1, 'LINESTRING(0 4.5, 12 4.5)', 'RoadX'),
+	(2, 'LINESTRING(7.5 0, 7.5 10.5)', 'RoadY');
+	
+insert into poi values
+	(1, 'POINT(1 3.5)', 'G'),
+	(2, 'POINT(5.5 1.5)', 'H'),
+	(3, 'POINT(9.5 6)', 'I'),
+	(4, 'POINT(6.5 6)', 'J'),
+	(5, 'POINT(6 9.5)', 'K');
+	
+-- zadanie 6
+-- a
+SELECT SUM(ST_Length(geometry))
+  FROM roads;
+-- b (use GeomFromText)
+ select st_asewkt(geometry) as WKT, st_area(geometry) as Area, ST_Perimeter(geometry) as Perimeter
+  from buildings where name = 'BuildingA';
+-- c
+ select name, 
+ st_area(geometry) as Area
+ from buildings
+ order by name asc; 
+-- d
+ select name, 
+ ST_Perimeter(geometry) as Perimeter
+ from buildings
+ order by st_area(geometry) desc
+ limit 2; 
+-- e
+ select st_distance('POINT(6 9.5)','POLYGON((3 8, 5 8, 5 6, 3 6, 3 8))') as distance;
+-- f
+ select  ST_area(st_difference('POLYGON((3 8, 5 8, 5 6, 3 6, 3 8))',
+ ST_buffer(ST_Intersection('POLYGON((3 8, 5 8, 5 6, 3 6, 3 8))', 'POLYGON((4 7, 6 7, 6 5, 4 5, 4 7))'),0.5)));
+-- g
+ select name from buildings where st_y(st_centroid(geometry)) > 4.5; 
+-- h
+ select st_area('POLYGON((3 8, 5 8, 5 6, 3 6, 3 8))') + st_area('POLYGON((4 7, 6 7, 6 8, 4 8, 4 7))')
+- st_area(st_intersection('POLYGON((3 8, 5 8, 5 6, 3 6, 3 8))','POLYGON((4 7, 6 7, 6 8, 4 8, 4 7))'));
