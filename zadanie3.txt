@@ -1,0 +1,44 @@
+-- zadanie 1
+create view new_buildings as 
+select buildings_2019.geom from buildings_2019
+left join buildings_2018 on buildings_2018.geom = buildings_2019.geom
+where buildings_2018.gid is null;
+
+-- zadanie 2
+create view new_points as 
+select points_2019.gid, points_2019.geom from points_2019
+left join points_2018 on points_2018.geom = points_2019.geom
+where points_2018.gid is null;
+
+select count(wynik) from 
+(select new_points.gid as wynik
+from new_points
+join new_buildings on ST_Intersects(ST_Buffer(new_buildings.geom, 0.005), new_points.geom) group by new_points.gid)
+as result;
+
+-- zadanie 3
+create table new_streets AS
+select gid, link_id, st_name, ref_in_id, nref_in_id, func_class, speed_cat,
+	fr_speed_l, to_speed_l, dir_travel, ST_Transform(geom, 3068) as geom from streets_2019;
+	
+-- zadanie 4/5
+create table input_points (
+    id serial primary key,
+    geom geometry(Point, 3068));
+
+ insert into input_points (geom) values
+    (ST_GeomFromText('POINT(8.36093 49.03174)', 3068)),
+    (ST_GeomFromText('POINT(8.39876 49.00644)', 3068));
+    
+ -- zadanie 6
+  create view line_6 as
+ select ST_MakeLine(geom) as geom from input_points; 
+
+select distinct street_nodes_2019.node_id from line_6, street_nodes_2019 
+where ST_Contains(ST_Buffer(line_6.geom, 0.002), street_nodes_2019.geom);
+
+-- zadanie 7
+select count(distinct points_2019.gid) from points_2019, parks_2019
+where points_2019.type = 'Sporting Goods Store' and ST_Intersects(points_2019.geom, ST_Buffer(parks_2019.geom, 0.003));
+
+
