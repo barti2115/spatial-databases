@@ -1,3 +1,6 @@
+-- przykladowa komenda do importu tabel z plikow shp
+-- shp2pgsql -s 4326 T2019_KAR_LAND_USE_A.shp  parks_2019 | psql -p 5433 -h localhost -U postgres -d postgres
+
 -- zadanie 1
 create view new_buildings as 
 select buildings_2019.geom from buildings_2019
